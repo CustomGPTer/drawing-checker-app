@@ -1,0 +1,6 @@
+flask
+gunicorn
+ezdxf
+PyMuPDF
+openai
+python-docx
