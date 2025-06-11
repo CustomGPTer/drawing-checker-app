@@ -3,7 +3,7 @@ services:
     name: drawing-checker-app
     env: python
     region: frankfurt
-    plan: free
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     autoDeploy: true
