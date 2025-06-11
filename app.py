@@ -80,7 +80,7 @@ def get_latest_revisions(folder):
         if not current or rev[1:] > current[1][1:]:
             drawings[base] = (filename, rev)
     return [os.path.join(folder, v[0]) for v in drawings.values()]
-  openai = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+openai = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def generate_prompt(drawing_number, title, revision, text, reference_texts, ref_drawings):
     spec_context = "\n".join([f"{name}:\n{doc[:1000]}" for name, doc in reference_texts.items()])
