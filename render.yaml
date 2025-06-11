@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: drawing-checker-app
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    autoDeploy: true
+    branch: main
