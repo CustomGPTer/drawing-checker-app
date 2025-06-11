@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Drawings</title>
+</head>
+<body>
+  <h2>Upload Your Drawings</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="drawings" multiple required>
+    <input type="submit" value="Upload">
+  </form>
+  <br>
+  <h3>Ask a question about your uploaded drawings</h3>
+  <textarea id="userQuestion" rows="4" cols="80" placeholder="Type your question..."></textarea><br>
+  <button onclick="askQuestion()">Ask</button>
+  <div id="chatResult"></div>
+
+  <script>
+    function askQuestion() {
+      const question = document.getElementById("userQuestion").value;
+      fetch("/ask", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("chatResult").innerText = data.answer;
+      });
+    }
+  </script>
+</body>
+</html>

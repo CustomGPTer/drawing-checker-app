@@ -4,3 +4,4 @@ ezdxf
 PyMuPDF
 openai
 python-docx
+pip
