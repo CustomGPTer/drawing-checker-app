@@ -72,14 +72,17 @@ def get_latest_revisions(folder):
         if not filename.lower().endswith(('.pdf', '.dwg', '.dxf')):
             continue
         match = re.match(r'(DR-[A-Z]+-\d+)-([CPD]\d+)\.', filename)
-        if not match:
-            continue
-        base = match.group(1)
-        rev = match.group(2)
-        current = drawings.get(base)
-        if not current or rev[1:] > current[1][1:]:
-            drawings[base] = (filename, rev)
+        if match:
+            base = match.group(1)
+            rev = match.group(2)
+            current = drawings.get(base)
+            if not current or rev[1:] > current[1][1:]:
+                drawings[base] = (filename, rev)
+        else:
+            # Include non-matching files using filename as fallback
+            drawings[filename] = (filename, "NA")
     return [os.path.join(folder, v[0]) for v in drawings.values()]
+
     
 openai = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
