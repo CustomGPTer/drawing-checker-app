@@ -89,17 +89,46 @@ openai = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 def generate_prompt(drawing_number, title, revision, text, reference_texts, ref_drawings):
     spec_context = "\n".join([f"{name}:\n{doc[:1000]}" for name, doc in reference_texts.items()])
     zip_context = "\n".join([f"{name}:\n{text[:1000]}" for name, text in ref_drawings.items()])
-    return f"""
-def generate_prompt(drawing_number, title, revision, text, reference_texts, ref_drawings):
-    spec_context = "\n".join([f"{name}:\n{doc[:1000]}" for name, doc in reference_texts.items()])
-    zip_context = "\n".join([f"{name}:\n{text[:1000]}" for name, text in ref_drawings.items()])
     
-    return f"""
+    qa_checks = '''
+1. ✅ Are all cover/invert levels shown, consistent, and buildable?
+2. ✅ Are pipe bedding types correct per CESWI/UUCESWI?
+3. ✅ Is flow direction clearly shown?
+4. ✅ Do chamber references and layouts match schedules?
+5. ✅ Are wall, slab, and foundation thicknesses shown and labelled?
+6. ✅ Is reinforcement correctly detailed?
+7. ✅ Are pipe sizes, gradients, and materials labelled?
+8. ✅ Are access ladders, platforms, or landings included where needed?
+9. ✅ Are chambers and covers accessible for lifting and maintenance?
+10. ✅ Are plans, sections, and detail views coordinated?
+11. ✅ Are cable tray routes clash-free with civils?
+12. ✅ Are ducts shown with correct layout, spacing, and annotation?
+13. ✅ Are drawpits and duct bends buildable and spaced to spec?
+14. ✅ Are pumps and valves fully detailed and accessible?
+15. ✅ Are mechanical/electrical isolations clearly marked?
+16. ✅ Are sensors and instruments located correctly?
+17. ✅ Are control panels coordinated with structure?
+18. ✅ Are civils penetrations shown for M&E systems?
+19. ✅ Are vent routes logical and clash-free?
+20. ✅ Are bonding and earthing points compliant?
+21. ✅ Does this drawing comply with CESWI/UUCESWI?
+22. ✅ Are United Utilities (UU) standard details applied correctly?
+23. ✅ Is this the current approved-for-construction revision?
+24. ✅ Are referenced drawings accurate and consistent?
+25. ✅ Are temporary works or staged build notes included where required?
+26. ✅ Are maintenance/lifting zones and fall protection shown?
+27. ✅ Is the scope clear in the title block and general notes?
+28. ✅ Is the drawing coordinated with current RAMS and construction methods?
+29. ✅ Are services and structures shown logically and buildable?
+30. ✅ Are there any omissions identified using your internal engineering knowledge?
+'''
+
+    return f'''
 You are a construction drawing checker built for C2V+ projects working on United Utilities infrastructure sites.
 
 A ZIP file of reference drawings has been uploaded. You must fully read and cross-reference all files, then assess the uploaded drawing.
 
-Use CESWI 7th Edition, UUCESWI amendments, and C2V+ “What Good Looks Like” standards.
+Use CESWI 7th Edition, UUCESWI amendments, and C2V+ "What Good Looks Like" standards.
 
 ### Drawing Details:
 - Drawing Number: {drawing_number}
@@ -117,7 +146,9 @@ Use CESWI 7th Edition, UUCESWI amendments, and C2V+ “What Good Looks Like” s
 
 ### Instructions:
 1. Identify the drawing type (e.g., Drainage Layout, Cable Routing, Valve Chamber)
-2. Apply all relevant checks from the following 30-point QA list
+2. Apply all relevant checks from the following 30-point QA list:
+{qa_checks}
+
 3. Output results in this format:
 
 ---
@@ -137,7 +168,8 @@ Then give:
 - Notes for further clarification (e.g. request plan/section views)
 
 Only refer to visible content — never assume.
-"""
+'''
+
 
 def call_gpt(prompt):
     response = openai.chat.completions.create(
