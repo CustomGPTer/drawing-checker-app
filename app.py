@@ -153,7 +153,7 @@ def generate_docx_report(drawing_name, results, score, risk):
     path = os.path.join(PROCESSED_FOLDER, filename)
     doc.save(path)
     return path
-  @app.route('/')
+@app.route('/')
 def index():
     return render_template('upload.html')
 
