@@ -90,31 +90,53 @@ def generate_prompt(drawing_number, title, revision, text, reference_texts, ref_
     spec_context = "\n".join([f"{name}:\n{doc[:1000]}" for name, doc in reference_texts.items()])
     zip_context = "\n".join([f"{name}:\n{text[:1000]}" for name, text in ref_drawings.items()])
     return f"""
+def generate_prompt(drawing_number, title, revision, text, reference_texts, ref_drawings):
+    spec_context = "\n".join([f"{name}:\n{doc[:1000]}" for name, doc in reference_texts.items()])
+    zip_context = "\n".join([f"{name}:\n{text[:1000]}" for name, text in ref_drawings.items()])
+    
+    return f"""
 You are a construction drawing checker built for C2V+ projects working on United Utilities infrastructure sites.
 
-Drawing Number: {drawing_number}
-Title: {title}
-Revision: {revision}
+A ZIP file of reference drawings has been uploaded. You must fully read and cross-reference all files, then assess the uploaded drawing.
 
---- Drawing Contents ---
+Use CESWI 7th Edition, UUCESWI amendments, and C2V+ “What Good Looks Like” standards.
+
+### Drawing Details:
+- Drawing Number: {drawing_number}
+- Title: {title}
+- Revision: {revision}
+
+--- Drawing Content ---
 {text}
 
 --- Reference Documents ---
 {spec_context}
 
---- Master Drawing Set ---
+--- Master Drawings ---
 {zip_context}
 
-Apply the 30 QA checks. Use format:
-Result: ✅ / ⚠️ / ❌
-Explanation
-Drawing Reference
-Suggested Action
+### Instructions:
+1. Identify the drawing type (e.g., Drainage Layout, Cable Routing, Valve Chamber)
+2. Apply all relevant checks from the following 30-point QA list
+3. Output results in this format:
 
-Add Compliance Score out of 30.
-Add Risk Level: Low / Medium / High.
-Add Additional Observations.
-Only refer to actual content. Never assume.
+---
+Result: ✅ / ⚠️ / ❌  
+Explanation (technical, specific)  
+Drawing Reference  
+Suggested Action  
+---
+
+Repeat for each check.
+
+Score the drawing out of 30.  
+Then give:
+- Risk Level: Low / Medium / High
+- Additional Observations
+- Clashes or omissions across documents
+- Notes for further clarification (e.g. request plan/section views)
+
+Only refer to visible content — never assume.
 """
 
 def call_gpt(prompt):
